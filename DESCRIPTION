@@ -1,0 +1,11 @@
+Package: FathomR
+Type: Package
+Title: Easy Manipulation of Innovasea Receiver Files
+Version: 0.1.0
+Author: Hugh Pederson
+Maintainer: Hugh Pederson <hugh.pederson@innovasea.com>
+Description: Assists with parsing and handling of Innovasea vdat, vrl and Fathom exported csv schema. Additional functions calculate receiver deployment times and diagnostic summaries.
+Depends: tidyverse, lubridate, data.table, progress, vroom, arrow
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
