@@ -1,3 +1,33 @@
+#' Parse Fathom Files
+#' 
+#' The function parses Innovasea's Fathom csv schema log files and returns a
+#' dataframe for record type. Fathom receiver log files (.vrl, .vdat) can be
+#' converted to user readable formats using FathomR::convert_log_files() or
+#' using Innovasea's Fathom Connect desktop application or cloud based service
+#' Fathom Central. Note: Export formats from Fathom Central are restricted
+#' interleaved .csv.
+#' 
+#' The *Date Time (UTC)* time variable is referenced to UTC time zone and is
+#' not adjusted for clock drift. *Time* variable is equivalent to the *Date
+#' Time (UTC)* following correction for clock drift using the *Time Correction
+#' (s)* variable.
+#' 
+#' @param path path to the folder on your local machine containing the Fathom
+#' interleaved .csv files
+#' 
+#' @return Returns a dataframe for each record type contained within the
+#' interleaved Fathom csv files, appending records from each source to the
+#' appropriate dataframes.
+#' @examples
+#' 
+#' \dontrun{
+#' #'   # This example shows how to call the process_log_files function
+#' #'   # Replace "/path/to/your/data" with a valid directory path on your system
+#' #'   parse_fathom_files('/path_to_fathom_csv_files')
+#' #' }
+#' 
+#' 
+#' @export parse_fathom_files
 parse_fathom_files <- function(directory_path) {
   Sys.setenv("VROOM_CONNECTION_SIZE" = 5000000)
 

@@ -1,3 +1,22 @@
+#' Parse Fathom Files (vroom)
+#' 
+#' The function parses Innovasea's Fathom csv schema log files and returns a
+#' dataframe for each record type.
+#' 
+#' 
+#' @param path path to the folder on your local machine containing the Fathom
+#' exported log files (.csv)
+#' 
+#' @examples
+#' 
+#' \dontrun{
+#' #'   # This example shows how to call the process_log_files function
+#' #'   # Replace "/path/to/your/data" with a valid directory path on your system
+#' #'   process_log_files("/path/to/your/data")
+#' #' }
+#' 
+#' 
+#' @export parse_fathom_files_vroom
 parse_fathom_files_vroom <- function(directory_path) {
 
   # Define paths to data files

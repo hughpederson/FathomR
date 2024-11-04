@@ -1,3 +1,25 @@
+#' Parse Fathom Parquet Files
+#
+#' @param x %% ~~Describe \code{x}
+#' @return %% ~Describe the value returned %% If it is a LIST, use %%
+#' \item{comp1 }{Description of 'comp1'} %% \item{comp2 }{Description of
+#' 'comp2'} %% ...
+#' @note %% ~~further notes~~
+#' @author %% ~~who you are~~
+#' @seealso %% ~~objects to See Also as \code{\link{help}}, ~~~
+#' @references %% ~put references to the literature/web site here ~
+#' @examples
+#'
+#' ##---- Should be DIRECTLY executable !! ----
+#' ##-- ==>  Define data, use random,
+#' ##--	or do  help(data=index)  for the standard data sets.
+#'
+#' ## The function is currently defined as
+#' function (x)
+#' {
+#'   }
+#'
+#' @export parse_fathom_parquet_files
 parse_fathom_parquet_files <- function(parent_directory, record_type = NULL) {
 
   subfolders <- list.dirs(parent_directory, full.names = TRUE, recursive = FALSE)

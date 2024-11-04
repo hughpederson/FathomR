@@ -44,6 +44,56 @@
 # }
 
 
+
+
+#' Flag False Detections - False Detection Analysis (FDA)
+#'
+#'
+#' False Detection Analysis flagging detections that are deemed to be potential
+#' false positives. False positive detections are flagged in the detection
+#' dataframe based on the criteria defined by Pincock (2012) based on the
+#' presence of at least one short interval between successive detections and
+#' there are more short intervals compared to long intervals. Single detections
+#' of an ID are also flagged as potential false positives. %% ~~ A concise (1-5
+#' lines) description of what the function does. ~~
+#'
+#'
+#' @param det Dataframe containing detection records. If proceeded by
+#' parse_log_files, use det dataframe.
+#' @param transmitter_id variable describing the transmitter ID in det.
+#' @param time_var Variable of type POSIXct describing time in the det
+#' dataframe.
+#' @param transmission_daley numeric value of type int describing the nominal
+#' delay interval of the transmitter IDs in det.
+#' @param short_multiplier numeric value of type int describing the lower
+#' threshold of acceptable intervals between successive detections, default =
+#' 30 x transmission_delay.
+#' @param long_multiplier numeric value of type int describing the upper
+#' threshold of acceptable intervals between successive detections, default =
+#' 720 x transmission_delay.
+#' @return Appends the false_positive_flag variable to the det dataframe to
+#' identify detections as true positive (1) or false positive (2).
+#' @note %% ~~further notes~~
+#' @author H. Pederson (hugh.pederson@@innovasea.com)
+#' @seealso %% ~~objects to See Also as \code{\link{help}}, ~~~
+#' @references For details on FDA see:
+#'
+#' Pincock, D. G. (2012): False Detections: What they are and how to remove
+#' them from detection data. Document #: DOC-004691 Version 03, April 17, 2012
+#'
+#' https://support.fishtracking.innovasea.com/s/downloads?tabset-59625=1
+#' @examples
+#'
+#' ##---- Should be DIRECTLY executable !! ----
+#' ##-- ==>  Define data, use random,
+#' ##--	or do  help(data=index)  for the standard data sets.
+#'
+#' ## The function is currently defined as
+#' function (x)
+#' {
+#'   }
+#'
+#' @export flag_false_detections
 flag_false_detections <- function(detection_df, transmitter_id, receiver_id, time_var, transmission_delay = 60,
                                   short_multiplier = 30, long_multiplier = 720) {
 
