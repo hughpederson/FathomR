@@ -6,7 +6,7 @@ Authors@R: c(
     person("Hugh", "Pederson", email = "hugh.pederson@innovasea.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0899-2978")))
 Description: Assists with parsing and handling of Innovasea vdat, vrl and Fathom exported csv schema. Additional functions calculate receiver deployment times and diagnostic summaries.
 Depends: tidyverse, lubridate, data.table, progress, vroom, arrow
-License: GPL (>= 2)
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
