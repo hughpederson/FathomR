@@ -1,0 +1,76 @@
+---
+title: "Receiver Performance Report"
+author: 'Hugh Pederson'
+date: "2024-11-09"
+output: html_document
+params: 
+  data_list: NULL
+  #variables: NULL
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+data_list <- params$data_list
+#variables <- params$variables
+```
+
+
+## Receiver Configuration Report
+
+### Receiver configuration
+```{r receiver metadata summary, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+receiver.meta <- cfg_channel %>%
+  select(Serial, Model, `Map ID`) %>%
+  left_join(event_init %>% select(Serial, `Firmware Version`))
+
+
+receiver.meta %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+```
+
+```{r receiver config, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+receiver.config.meta <- cfg_channel %>% 
+  select(Serial, Model, `Map ID`) %>% 
+  left_join(cfg_transmitter %>% select(Serial, Time, `Full ID`, `Power Level`, `Min Delay (s)`, `Max Delay (s)`), by = c('Serial'))
+  
+
+receiver.config.meta %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+```
+
+### Receiver Clock Drift
+```{r receiver clock ref, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+receiver.clock_ref <- clock_ref %>% 
+  filter(Source == 'OFFLOAD') %>% 
+  select(Serial, `Device Time (UTC)`, `External Time (UTC)`, `External Difference (s)`, Source)
+
+receiver.clock_ref %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+```
+
+### Receiver Issues
+```{r receiver firmware events, include=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+rec.events <- event %>%
+  select(Serial, `Device Time (UTC)`, Type, Description)
+
+rec.events %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+```
+
+### Receiver Offload
+```{r receiver offload, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+event_offload %>% 
+  select(Serial, `Device Time (UTC)`, `External Time (UTC)`, `External Time Zone`, `PPM Total Accepted Detections`,
+         `Battery Remaining (%)`, `Memory Remaining (%)`) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
