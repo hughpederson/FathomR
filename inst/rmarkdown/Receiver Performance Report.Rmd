@@ -1,6 +1,6 @@
 ---
 title: "Receiver Performance Report"
-author: 'Hugh Pederson'
+author: 'FathomR'
 date: "2024-11-09"
 output: html_document
 params: 
@@ -74,3 +74,49 @@ event_offload %>%
 
 ```
 
+## Detection Summaries
+
+### Internal Transmitter Detection Summary
+```{r dets, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE}
+
+internal_Tx <- receiver.config.meta$`Full ID`
+
+int.Tx.dets <- det %>% 
+  filter(`Full ID` %in% internal_Tx)
+
+animal.dets <- det %>% 
+  filter(!`Full ID` %in% internal_Tx)
+
+int.Tx.dets %>% 
+  group_by(Serial, `Full ID`) %>% 
+  summarise(count = n()) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+ggplot(int.Tx.dets)+
+  geom_bar(aes(as.factor(Serial)))+
+  labs(x = 'Serial', y='Detection Count', title ='Internal Transmitter Detection Count')
+
+```
+
+### Animal Detection Summary
+```{r animal det summary, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE}
+
+animal.dets %>% 
+  group_by(Serial) %>% 
+  summarise(count = n()) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+
+ggplot(animal.dets)+
+  geom_bar(aes(y = as.factor(Serial)))+
+  labs(x = 'Serial', y='Detection Count', title ='Internal Transmitter Detection Count')
+
+ggplot(animal.dets)+
+  geom_bar(aes(y=as.factor(`Full ID`)))+
+  labs(y='Detection Count', title = 'Animal Detection Count')
+
+
+
+```
