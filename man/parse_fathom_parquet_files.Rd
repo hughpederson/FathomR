@@ -2,40 +2,41 @@
 % Please edit documentation in R/parse_fathom_parquet_files.R
 \name{parse_fathom_parquet_files}
 \alias{parse_fathom_parquet_files}
-\title{Parse Fathom Parquet Files}
+\title{Parse Fathom Parquet Files
+The function parses Innovasea's Fathom parquet schema log files which have been
+split into individual parquet files based on record type
+Fathom receiver log files (.vrl, .vdat) can be
+converted to user readable formats using FathomR::convert_log_files() or
+using Innovasea's Fathom Connect desktop application or cloud based service
+Fathom Central. Note: Export formats from Fathom Central are restricted to
+interleaved .csv.}
 \usage{
 parse_fathom_parquet_files(parent_directory, record_type = NULL)
 }
 \arguments{
-\item{x}{%% ~~Describe \code{x}}
+\item{record_type}{string describing the record type to parse}
+
+\item{path}{path to the parent folder containing subfolders for parsing}
 }
 \value{
-
+Returns a dataframe for the selected record types
 }
 \description{
 Parse Fathom Parquet Files
-}
-\note{
-%% ~~further notes~~
+The function parses Innovasea's Fathom parquet schema log files which have been
+split into individual parquet files based on record type
+Fathom receiver log files (.vrl, .vdat) can be
+converted to user readable formats using FathomR::convert_log_files() or
+using Innovasea's Fathom Connect desktop application or cloud based service
+Fathom Central. Note: Export formats from Fathom Central are restricted to
+interleaved .csv.
 }
 \examples{
 
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+#'   # This example shows how to call the process_log_files function
+#'   # Replace "/path/to/your/data" with a valid directory path on your system
+#'   parse_fathom_parquet_files('/path_to_fathom_parquet_files_parent_folder', record_type = 'DET')
+#' }
 
-## The function is currently defined as
-function (x)
-{
-  }
-
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\author{
-%% ~~who you are~~
 }

@@ -2,7 +2,9 @@
 title: "Receiver Performance Report"
 author: 'FathomR'
 date: "2024-11-09"
-output: html_document
+output: 
+  html_document:
+    self_contained: false
 params: 
   data_list: NULL
   #variables: NULL
@@ -31,6 +33,83 @@ receiver.meta %>%
   kableExtra::kable_styling()
 ```
 
+## Receiver Transmitter Specification
+```{r include=TRUE, echo=FALSE, results='asis' }
+receiver.config.meta <- cfg_channel %>% 
+  select(Serial, Model, `Map ID`) %>% 
+  left_join(cfg_transmitter %>% select(Serial, Time, `Full ID`, `Power Level`, `Min Delay (s)`, `Max Delay (s)`), by = c('Serial'))
+  
+
+# Get unique serial numbers
+serial_numbers <- unique(receiver.config.meta$Serial)
+
+#serial_numbers <- 0
+
+
+for (i in serial_numbers){
+  #serial_numbers <- serial_numbers + 1
+  cat("\n# Receiver", i, '{.tabset}', "\n")
+  cat("\n")
+  
+  df_subset <- subset(receiver.config.meta, Serial == serial_numbers[i])
+  
+  df_subset %>% 
+  kableExtra::kbl() %>%
+  kableExtra::kable_styling()
+  cat("\n")
+}
+
+# 
+# # Start of tab navigation HTML
+# cat('<ul class="nav nav-tabs" role="tablist">')
+# for (i in seq_along(serial_numbers)) {
+#   # Create a tab for each serial number
+#   tab_id <- paste0("tab_", i)
+#   cat(sprintf('<li role="presentation" %s><a href="#%s" role="tab" data-toggle="tab">%s</a></li>',
+#               if (i == 1) 'class="active"' else '',  # Set the first tab as active
+#               tab_id,
+#               serial_numbers[i]))
+# }
+# cat('</ul>')
+# 
+# # Start of tab content panels
+# cat('<div class="tab-content">')
+# for (i in seq_along(serial_numbers)) {
+#   tab_id <- paste0("tab_", i)
+#   
+#   # Set the first panel as active
+#   cat(sprintf('<div role="tabpanel" class="tab-pane %s" id="%s">', 
+#               if (i == 1) 'active' else '', tab_id))
+#   
+#   # Filter data for the current serial number
+#   df_subset <- subset(receiver.config.meta, Serial == serial_numbers[i])
+#   
+#   # Generate the content for each tab
+#   cat(sprintf("<h3>Receiver Serial Number: %s</h3>", serial_numbers[i]))
+#   
+#   # Display summary statistics
+#   cat("<h4>Summary Statistics</h4>")
+#   df_subset %>% 
+#   kableExtra::kbl() %>% 
+#   kableExtra::kable_styling()
+#   
+#   # Create plots for numeric variables (optional)
+#   # numeric_vars <- names(df_subset)[sapply(df_subset, is.numeric)]
+#   # for (var in numeric_vars) {
+#   #   cat(sprintf("<h5>Plot of %s</h5>", var))
+#   #   print(plot(df_subset[[var]], main = paste("Plot of", var, "for Serial Number", serial_numbers[i])))
+#   #}
+#   
+#   cat("</div>")  # Close the tab pane
+# }
+# 
+# cat('</div>')  # Close the tab content
+
+
+```
+
+
+
 ```{r receiver config, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 receiver.config.meta <- cfg_channel %>% 
   select(Serial, Model, `Map ID`) %>% 
@@ -42,7 +121,7 @@ receiver.config.meta %>%
   kableExtra::kable_styling()
 ```
 
-### Receiver Clock Drift
+## Receiver Clock Drift
 ```{r receiver clock ref, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
 receiver.clock_ref <- clock_ref %>% 
@@ -54,7 +133,7 @@ receiver.clock_ref %>%
   kableExtra::kable_styling()
 ```
 
-### Receiver Issues
+## Receiver Issues
 ```{r receiver firmware events, include=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
 rec.events <- event %>%
   select(Serial, `Device Time (UTC)`, Type, Description)
@@ -64,7 +143,7 @@ rec.events %>%
   kableExtra::kable_styling()
 ```
 
-### Receiver Offload
+## Receiver Offload
 ```{r receiver offload, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 event_offload %>% 
   select(Serial, `Device Time (UTC)`, `External Time (UTC)`, `External Time Zone`, `PPM Total Accepted Detections`,
