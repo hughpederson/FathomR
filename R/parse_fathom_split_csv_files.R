@@ -51,7 +51,7 @@ parse_fathom_split_csv_files <- function(parent_directory, record_type = NULL) {
         message(paste("Reading file:", file))
 
         df <- tryCatch({
-          fread(file, header = TRUE, skip = 3, sep = ",", fill = TRUE, stringsAsFactors = FALSE, showProgress = FALSE)
+          fread(file, header = TRUE, skip = 2, sep = ",", fill = TRUE, stringsAsFactors = FALSE, showProgress = FALSE)
         }, error = function(e) {
           message(paste("Error in reading file:", file))
           return(NULL)
