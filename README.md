@@ -20,7 +20,7 @@ Converts Innovasea's acoustic receiver logfile formats (.vrl, .vdat) to csv or p
 
 `parse_fathom_files()`
 
-Parsing of Fathom's interleaved csv file format where each record type if contained within a single file. Produces a list of names dataframes, one for each record type and appends records from each csv file located within the file path.  
+Parsing of Fathom's interleaved csv file format where each record type if contained within a single file. Produces a list of named dataframes, one for each record type and appends records from each csv file located within the file path.  
 
 `parse_split_fathom_csv_files()`
 
