@@ -2,14 +2,7 @@
 % Please edit documentation in R/parse_fathom_parquet_files.R
 \name{parse_fathom_parquet_files}
 \alias{parse_fathom_parquet_files}
-\title{Parse Fathom Parquet Files
-The function parses Innovasea's Fathom parquet schema log files which have been
-split into individual parquet files based on record type
-Fathom receiver log files (.vrl, .vdat) can be
-converted to user readable formats using FathomR::convert_log_files() or
-using Innovasea's Fathom Connect desktop application or cloud based service
-Fathom Central. Note: Export formats from Fathom Central are restricted to
-interleaved .csv.}
+\title{Parse Fathom Parquet Files}
 \usage{
 parse_fathom_parquet_files(parent_directory, record_type = NULL)
 }
@@ -22,7 +15,6 @@ parse_fathom_parquet_files(parent_directory, record_type = NULL)
 Returns a dataframe for the selected record types
 }
 \description{
-Parse Fathom Parquet Files
 The function parses Innovasea's Fathom parquet schema log files which have been
 split into individual parquet files based on record type
 Fathom receiver log files (.vrl, .vdat) can be

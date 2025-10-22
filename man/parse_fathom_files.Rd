@@ -4,16 +4,27 @@
 \alias{parse_fathom_files}
 \title{Parse Fathom Files}
 \usage{
-parse_fathom_files(directory_path)
+parse_fathom_files(
+  directory_path,
+  output = c("list", "env"),
+  envir = .GlobalEnv,
+  overwrite = TRUE
+)
 }
 \arguments{
+\item{output}{defines the output type "list" or "env"}
+
+\item{envir}{defines the environment to which dataframes will be added}
+
+\item{overwrite}{will overwrite existing objects in the environment with the same name}
+
 \item{path}{path to the folder on your local machine containing the Fathom
 interleaved .csv files}
 }
 \value{
-Returns a dataframe for each record type contained within the
-interleaved Fathom csv files, appending records from each source to the
-appropriate dataframes.
+Returns a list of dataframes, one for each record type contained within the
+interleaved Fathom csv files, appending records from each receiver to the
+appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
 }
 \description{
 The function parses Innovasea's Fathom csv schema log files and returns a
@@ -34,7 +45,9 @@ Time (UTC)* following correction for clock drift using the *Time Correction
 \dontrun{
 #'   # This example shows how to call the process_log_files function
 #'   # Replace "/path/to/your/data" with a valid directory path on your system
-#'   parse_fathom_files('/path_to_fathom_csv_files')
+#'   results <- parse_fathom_files('/path_to_fathom_csv_files')
+#'   or
+#'   parse_fathom_files('/path_to_fathom_csv_files', output ='env")
 #' }
 
 
