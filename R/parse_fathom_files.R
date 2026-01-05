@@ -18,12 +18,16 @@
 #' @param output defines the output type "list" or "env"
 #'
 #' @param envir defines the environment to which dataframes will be added
-#'
+#' 
+#' @param vars defines which Fathom variables to open. Options include: attitude, battery, cfg_channel, cfg_station,
+#'  cfg_study, cfg_transmitter, clock_ref, data_source_file, depth, det, diag, event, event_init, event_offload, health_vr2ar, temp. All 
+#' variables are loaded by default.   
+#' 
 #' @param overwrite will overwrite existing objects in the environment with the same name
 #'
 #' @return Returns a list of dataframes, one for each record type contained within the
 #' interleaved Fathom csv files, appending records from each receiver to the
-#' appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
+#' appropriate dataframes. Output option "env" will return individual dataframes for each record type direct to the environment
 #' @examples
 #'
 #' \dontrun{
@@ -131,6 +135,7 @@
 parse_fathom_files <- function(directory_path,
                                output = c("list", "env"),
                                envir = .GlobalEnv,
+                               vars = "All",
                                overwrite = TRUE) {
   output <- match.arg(output)
   Sys.setenv("VROOM_CONNECTION_SIZE" = 5000000)
@@ -141,7 +146,8 @@ parse_fathom_files <- function(directory_path,
   if (!length(fcsv.files)) stop("No CSV files found in the directory.")
 
   create_empty_dataframes <- function(file_path) {
-    lines <- readr::read_lines(file_path)
+    lines <- readr::read_lines(file_path,
+      progress = FALSE)
     desc_lines <- grep("_DESC", lines, value = TRUE)
 
     data_frames <- list()
@@ -163,7 +169,7 @@ parse_fathom_files <- function(directory_path,
   }
 
   # seed empty frames using first csv
-  data_frames <- create_empty_dataframes(fcsv.files[1])
+  data_frames <- create_empty_dataframes(file_path = fcsv.files[1])
 
   # ---- read all csvs (skip first 2 header lines) ----
   pb <- progress::progress_bar$new(
@@ -189,7 +195,7 @@ parse_fathom_files <- function(directory_path,
   })
 
   grouped_data <- all_data %>%
-    mutate(section_name = tolower(.data$X.1)) %>%
+    mutate(section_name = tolower(X.1)) %>%
     select(-.data$X.1) %>%
     group_by(.data$section_name)
 
@@ -198,7 +204,16 @@ parse_fathom_files <- function(directory_path,
   names(data_by_section_with_names) <- unique_section_names
 
   # keep only sections we know about (from _DESC)
-  common_sections <- intersect(names(data_frames), names(data_by_section_with_names))
+
+  if (length(vars) == 1) {
+    if (vars == "All") {
+      common_sections <- intersect(names(data_frames), names(data_by_section_with_names))
+    } else {
+      common_sections <- vars  
+    }
+  } else {
+    common_sections <- vars
+  }
 
   data_frames_updated <- purrr::map2(
     data_frames[common_sections],

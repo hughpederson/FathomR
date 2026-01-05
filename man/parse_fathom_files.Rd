@@ -8,6 +8,7 @@ parse_fathom_files(
   directory_path,
   output = c("list", "env"),
   envir = .GlobalEnv,
+  vars = "All",
   overwrite = TRUE
 )
 }
@@ -15,6 +16,10 @@ parse_fathom_files(
 \item{output}{defines the output type "list" or "env"}
 
 \item{envir}{defines the environment to which dataframes will be added}
+
+\item{vars}{defines which Fathom variables to open. Options include: attitude, battery, cfg_channel, cfg_station,
+ cfg_study, cfg_transmitter, clock_ref, data_source_file, depth, det, diag, event, event_init, event_offload, health_vr2ar, temp. All 
+variables are loaded by default.}
 
 \item{overwrite}{will overwrite existing objects in the environment with the same name}
 
@@ -24,11 +29,11 @@ interleaved .csv files}
 \value{
 Returns a list of dataframes, one for each record type contained within the
 interleaved Fathom csv files, appending records from each receiver to the
-appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
+appropriate dataframes. Output option "env" will return individual dataframes for each record type direct to the environment
 }
 \description{
-The function parses Innovasea's Fathom csv schema log files and returns a
-dataframe for record type. Fathom receiver log files (.vrl, .vdat) can be
+The function parses Innovasea's Fathom csv schema log files and returns a named list
+of dataframes, one for each record type. Fathom receiver log files (.vrl, .vdat) can be
 converted to user readable formats using FathomR::convert_log_files() or
 using Innovasea's Fathom Connect desktop application or cloud based service
 Fathom Central. Note: Export formats from Fathom Central are restricted
