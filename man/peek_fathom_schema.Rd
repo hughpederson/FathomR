@@ -10,7 +10,7 @@ peek_fathom_schema(
   envir = .GlobalEnv,
   overwrite = TRUE,
   n_max_header_lines = 500,
-  example_n = 0,
+  example_n = 5,
   example_max_files = 50,
   verbose = TRUE
 )
@@ -49,7 +49,12 @@ containing example dataframes expected from parse_fathom_files().
 #'   fathom_schema <- peek_fathom_schema('/path_to_fathom_csv_files', output = 'list")
 
 #'   fathom_schema <- peek_fathom_schema('/path_to_fathom_csv_files',
-                                            output = 'list", example_n = 5)
+#'                                             output = 'list", example_n = 5)
+
+#'  names(res$data)
+#'  str(res$data$det)
+#'  res$data$det
+#'  print(n=30, res$report$summary)
 
 #' }
 
