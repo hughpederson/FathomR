@@ -16,6 +16,12 @@ To assist with first step of exploring detection data a False Detection Analysis
 
 Converts Innovasea's acoustic receiver logfile formats (.vrl, .vdat) to csv or parquet file formats. Conversion of receiver logfiles requires either the instillation of Innovasea's Fathom Connect software or access to the standalone 'vdat.exe' executable. Files converted to Fathom's interleaved csv will contain all records type within a single file, files converted to Fathom split csv format will result in a folder for each logfile with separate csv files for each record type. Files converted to parquet format will result in a folder for each logfile with separate paraquet files for each record type.  
 
+### View Fathom csv Schema
+
+`peek_fathom_schema()`
+
+Peek into the Fathom interleaved csv schema and extract summary information of the record types expected from parse_fathom_files(). Summary reports can include samples of the interleaved data for users to inspect variable class. 
+
 ### Parse Fathom csv file formats
 
 `parse_fathom_files()`
