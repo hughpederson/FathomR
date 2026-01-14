@@ -27,8 +27,8 @@ interleaved Fathom csv files, appending records from each receiver to the
 appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
 }
 \description{
-The function parses Innovasea's Fathom csv schema log files and returns a
-dataframe for record type. Fathom receiver log files (.vrl, .vdat) can be
+The function parses Innovasea's Fathom csv schema log files and returns a named list
+of dataframes, one for each record type. Fathom receiver log files (.vrl, .vdat) can be
 converted to user readable formats using FathomR::convert_log_files() or
 using Innovasea's Fathom Connect desktop application or cloud based service
 Fathom Central. Note: Export formats from Fathom Central are restricted
