@@ -26,7 +26,7 @@ Peek into the Fathom interleaved csv schema and extract summary information of t
 
 `parse_fathom_files()`
 
-Parsing of Fathom's interleaved csv file format where each record type if contained within a single file. Produces a list of named dataframes, one for each record type and appends records from each csv file located within the file path.  
+Parsing of Fathom's interleaved csv file format where each record type if contained within a single file. Produces a list of named tibbles, one for each record type and appends records from each csv file located within the file path.  
 
 `parse_split_fathom_csv_files()`
 
