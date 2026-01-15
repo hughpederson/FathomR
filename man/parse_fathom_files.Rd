@@ -6,25 +6,31 @@
 \usage{
 parse_fathom_files(
   directory_path,
+  rec_type = NULL,
   output = c("list", "env"),
   envir = .GlobalEnv,
-  overwrite = TRUE
+  overwrite = TRUE,
+  as_tibble = TRUE
 )
 }
 \arguments{
+\item{rec_type}{defines the record type(s) to be extracted from the csv files}
+
 \item{output}{defines the output type "list" or "env"}
 
 \item{envir}{defines the environment to which dataframes will be added}
 
 \item{overwrite}{will overwrite existing objects in the environment with the same name}
 
+\item{as_tibble}{outputs will be type tibble (default), otherwise type data.frame}
+
 \item{path}{path to the folder on your local machine containing the Fathom
 interleaved .csv files}
 }
 \value{
-Returns a list of dataframes, one for each record type contained within the
+Returns a list of tibbles, one for each record type contained within the
 interleaved Fathom csv files, appending records from each receiver to the
-appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
+appropriate tibble. Output option "env" will return individual tibbles for each record type direct to the environment
 }
 \description{
 The function parses Innovasea's Fathom csv schema log files and returns a named list

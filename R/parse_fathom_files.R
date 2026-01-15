@@ -15,15 +15,19 @@
 #' @param path path to the folder on your local machine containing the Fathom
 #' interleaved .csv files
 #'
+#' @param rec_type defines the record type(s) to be extracted from the csv files
+#'
 #' @param output defines the output type "list" or "env"
 #'
 #' @param envir defines the environment to which dataframes will be added
 #'
 #' @param overwrite will overwrite existing objects in the environment with the same name
 #'
-#' @return Returns a list of dataframes, one for each record type contained within the
+#' @param as_tibble outputs will be type tibble (default), otherwise type data.frame
+#'
+#' @return Returns a list of tibbles, one for each record type contained within the
 #' interleaved Fathom csv files, appending records from each receiver to the
-#' appropriate dataframes. Output option "env" willreturn individual dataframes for each record type direct to the environment
+#' appropriate tibble. Output option "env" will return individual tibbles for each record type direct to the environment
 #' @examples
 #'
 #' \dontrun{
@@ -38,22 +42,48 @@
 #' @export parse_fathom_files
 
 parse_fathom_files <- function(directory_path,
-                               output = c("list", "env"),
-                               envir = .GlobalEnv,
-                               overwrite = TRUE) {
-  output <- match.arg(output)
-  Sys.setenv("VROOM_CONNECTION_SIZE" = 5000000)
+                                  rec_type = NULL,
+                                  output = c("list", "env"),
+                                  envir = .GlobalEnv,
+                                  overwrite = TRUE,
+                                  as_tibble = TRUE) {
 
-  # ---- helpers & checks ----
+  output <- match.arg(output)
+
   stopifnot(dir.exists(directory_path))
-  fcsv.files <- list.files(path = directory_path, pattern = "\\.csv$", full.names = TRUE)
+
+  fcsv.files <- sort(list.files(
+    path = directory_path,
+    pattern = "\\.csv$",
+    full.names = TRUE,
+    recursive = TRUE
+  ))
   if (!length(fcsv.files)) stop("No CSV files found in the directory.")
 
-  create_empty_dataframes <- function(file_path) {
+  normalize_rec_type <- function(x) {
+    x <- tolower(trimws(x))
+    x <- gsub("_desc$", "", x)
+    x[nzchar(x)]
+  }
+  rec_type_norm <- if (is.null(rec_type)) NULL else normalize_rec_type(rec_type)
+
+  create_schema <- function(file_path, rec_type_norm = NULL) {
     lines <- readr::read_lines(file_path)
     desc_lines <- grep("_DESC", lines, value = TRUE)
 
-    data_frames <- list()
+    if (!is.null(rec_type_norm)) {
+      keep <- vapply(desc_lines, function(line) {
+        descriptor <- stringr::str_extract(line, "^[^,]+")
+        section_name <- tolower(gsub("_DESC", "", descriptor))
+        section_name %in% rec_type_norm
+      }, logical(1))
+      desc_lines <- desc_lines[keep]
+      if (!length(desc_lines)) {
+        stop("Requested rec_type not found in _DESC lines of: ", basename(file_path))
+      }
+    }
+
+    schema <- list()
     for (line in desc_lines) {
       descriptor <- stringr::str_extract(line, "^[^,]+")
       variables_str <- stringr::str_extract(line, "(?<=_DESC,).*$")
@@ -63,91 +93,148 @@ parse_fathom_files <- function(directory_path,
       variable_names <- variable_names[variable_names != "" & !is.na(variable_names)]
       variable_names <- make.unique(variable_names)
 
-      # create a tibble with zero rows and the right columns
-      data_frames[[section_name]] <- tibble::tibble(
-        !!!stats::setNames(rep(list(character(0)), length(variable_names)), variable_names)
+      schema[[section_name]] <- list(
+        colnames = variable_names,
+        ncols = length(variable_names)
       )
     }
-    data_frames
+    schema
   }
 
-  # seed empty frames using first csv
-  data_frames <- create_empty_dataframes(fcsv.files[1])
+  schema <- create_schema(fcsv.files[1], rec_type_norm = rec_type_norm)
+  sections <- names(schema)
 
-  # ---- read all csvs (skip first 2 header lines) ----
+  fread_fathom <- function(fp, select_cols = NULL) {
+    data.table::fread(
+      fp,
+      sep = ",",
+      header = FALSE,
+      fill = TRUE,
+      skip = 2,
+      colClasses = "character",
+      select = select_cols,
+      showProgress = FALSE
+    )
+  }
+
+  acc <- setNames(vector("list", length(sections)), sections)
+  for (s in sections) acc[[s]] <- list()
+
   pb <- progress::progress_bar$new(
-    format = "[:bar] :percent Reading :current/:total files, eta: :eta",
+    format = "[:bar] :percent Parsing :current/:total files, eta: :eta",
     total = length(fcsv.files), clear = FALSE, width = 60
   )
 
-  fcsv.list <- lapply(fcsv.files, function(fp) {
-    pb$tick()
-    utils::read.table(fp,
-                      sep = ",",
-                      col.names = paste("X", 1:100),  # gives "X 1", "X 2", ... -> becomes X.1, X.2
-                      colClasses = rep("character", 100),
-                      fill = TRUE, skip = 2, quote = "", comment.char = "")
-  })
+  if (!is.null(rec_type_norm) && length(rec_type_norm) == 1) {
 
-  all_data <- data.table::rbindlist(fcsv.list, fill = TRUE)
+    s <- rec_type_norm[[1]]
+    if (!s %in% sections) stop("Requested rec_type '", s, "' not present in schema from _DESC.")
 
-  # ---- split by section ----
-  suppressPackageStartupMessages({
-    library(dplyr)
-    library(purrr)
-  })
+    ncols <- schema[[s]]$ncols
+    select_cols <- 1:(ncols + 1)
 
-  grouped_data <- all_data %>%
-    mutate(section_name = tolower(.data$X.1)) %>%
-    select(-.data$X.1) %>%
-    group_by(.data$section_name)
+    for (fp in fcsv.files) {
+      pb$tick()
 
-  unique_section_names <- dplyr::group_keys(grouped_data)$section_name
-  data_by_section_with_names <- dplyr::group_split(grouped_data)
-  names(data_by_section_with_names) <- unique_section_names
+      dt <- fread_fathom(fp, select_cols = select_cols)
+      if (!nrow(dt)) next
 
-  # keep only sections we know about (from _DESC)
-  common_sections <- intersect(names(data_frames), names(data_by_section_with_names))
+      dt <- dt[tolower(V1) == s]
+      if (!nrow(dt)) next
 
-  data_frames_updated <- purrr::map2(
-    data_frames[common_sections],
-    data_by_section_with_names[common_sections],
-    ~{
-      n_cols_x <- ncol(.x)
-      .y_adjusted <- .y %>% dplyr::select(seq_len(n_cols_x))
-      colnames(.y_adjusted) <- colnames(.x)
-      dplyr::bind_rows(.y_adjusted, .x)
+      dt[, V1 := NULL]
+
+      cur <- ncol(dt)
+      if (cur < ncols) {
+        for (j in (cur + 1):ncols) data.table::set(dt, j = j, value = NA_character_)
+      } else if (cur > ncols) {
+        dt <- dt[, seq_len(ncols), with = FALSE]
+      }
+
+      data.table::setnames(dt, schema[[s]]$colnames)
+      acc[[s]][[length(acc[[s]]) + 1]] <- dt
     }
-  )
 
-  # ---- light typing / renames ----
-  data_frames_updated2 <- lapply(data_frames_updated, function(df) {
-    if ("Time" %in% names(df) && "Serial Number" %in% names(df)) {
-      df %>%
-        mutate(
-          Time = as.POSIXct(.data$Time, format = "%Y-%m-%d %H:%M:%OS", tz = "UTC"),
-          Serial = suppressWarnings(as.integer(`Serial Number`))
-        ) %>%
-        select(-`Serial Number`)
-    } else df
+  } else {
+    max_ncols <- max(vapply(schema, `[[`, numeric(1), "ncols"))
+    select_cols <- 1:(max_ncols + 1)
+
+    for (fp in fcsv.files) {
+      pb$tick()
+
+      dt <- fread_fathom(fp, select_cols = select_cols)
+      if (!nrow(dt)) next
+
+      dt[, section := tolower(V1)]
+      if (!is.null(rec_type_norm)) {
+        dt <- dt[section %in% rec_type_norm]
+      }
+      dt <- dt[section %in% sections]
+      if (!nrow(dt)) next
+
+      dt[, V1 := NULL]
+
+      spl <- split(dt, by = "section", keep.by = FALSE)
+
+      for (s in names(spl)) {
+        piece <- spl[[s]]
+        ncols <- schema[[s]]$ncols
+
+        cur <- ncol(piece)
+        if (cur < ncols) {
+          for (j in (cur + 1):ncols) data.table::set(piece, j = j, value = NA_character_)
+        } else if (cur > ncols) {
+          piece <- piece[, seq_len(ncols), with = FALSE]
+        }
+
+        data.table::setnames(piece, schema[[s]]$colnames)
+        acc[[s]][[length(acc[[s]]) + 1]] <- piece
+      }
+    }
+  }
+
+  out <- lapply(sections, function(s) {
+    pieces <- acc[[s]]
+    if (!length(pieces)) {
+      data.table::as.data.table(setNames(vector("list", schema[[s]]$ncols), schema[[s]]$colnames))
+    } else {
+      data.table::rbindlist(pieces, use.names = TRUE, fill = TRUE)
+    }
   })
+  names(out) <- sections
 
-  # ---- output mode ----
+  for (s in names(out)) {
+    dt <- out[[s]]
+
+    if ("Time" %in% names(dt)) {
+      dt[, Time := fasttime::fastPOSIXct(Time, tz = "UTC")]
+    }
+
+    if ("Serial Number" %in% names(dt)) {
+      dt[, Serial := suppressWarnings(as.integer(`Serial Number`))]
+      dt[, `Serial Number` := NULL]
+    }
+
+    out[[s]] <- dt
+  }
+
+  if (isTRUE(as_tibble)) {
+    out <- lapply(out, tibble::as_tibble)
+  }
+
   if (output == "env") {
-    # check overwrites if requested
     if (!overwrite) {
-      existing <- names(data_frames_updated2)[names(data_frames_updated2) %in% ls(envir = envir)]
+      existing <- names(out)[names(out) %in% ls(envir = envir)]
       if (length(existing)) {
         stop("Objects already exist in target environment: ",
              paste(existing, collapse = ", "),
              ". Set overwrite = TRUE to replace.")
       }
     }
-    list2env(data_frames_updated2, envir = envir)
-    invisible(data_frames_updated2)  # still return (invisibly) for piping/tests
+    list2env(out, envir = envir)
+    invisible(out)
   } else {
-    # default: return a named list of data frames
-    data_frames_updated2
+    out
   }
 }
 
