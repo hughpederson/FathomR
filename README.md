@@ -39,7 +39,14 @@ Parsing of Fathom's exported parquet file format which are split by record type 
 ### False Detection Analysis
 
 `flag_false_detections()`
+
 False Detection Analysis function which identifies false positive detection based on a revised version of the Pincock (2012) method, isolating single detections and comparing the ratio of short to long periods between successive deetctions across one or multiple receivers. Appends a 'false_positive_flag' variable to the input dataframe and provides a summary of flagged false positives. 
+
+### Convert Fathom to VUE format
+
+`fathom_to_VUE`
+
+Helper function to convert detection data parsed by parse_fathom_files() to replicate the data structure of detections exported from legacy Vemco User Environment (VUE) software. The converted data structure also includes a 'Time.corrected' variable (tz='UTC') which is the 'Date and Time (UTC)' variable corrected for receiver clock drift.    
 
 # Installation
 
