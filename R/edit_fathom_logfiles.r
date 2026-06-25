@@ -110,8 +110,9 @@ fathom_logfile_detection_count <- function(path, minTime = NULL, maxTime = NULL,
 #'   `Date`, `POSIXt`, or a single character string in a common date-time
 #'   format.
 #' @param time_filter_scope Character string controlling which record types are
-#'   time-filtered when `time_filter_record_types` is `NULL`. One of `"det"`,
-#'   `"det_diag"`, or `"all"`.
+#'   time-filtered when `time_filter_record_types` is `NULL`. One of `"DET"`,
+#'   `"DIAG"`, or any other records contained within the Fathom interleaved 
+#'  csv format.
 #' @param time_filter_record_types Optional character vector of explicit record
 #'   types to time-filter. When supplied, this overrides `time_filter_scope`.
 #' @param tz Time zone used when parsing `minTime`, `maxTime`, and file record
