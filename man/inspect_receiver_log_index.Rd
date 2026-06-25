@@ -16,18 +16,18 @@ inspect_receiver_log_index(
 receiver log csv files.}
 
 \item{pattern}{Regular expression used to identify files to parse. Defaults
-to \code{\\.csv$}.}
+to `\\.csv$`.}
 
 \item{assign_name}{Optional character string naming an object to assign in
-\code{envir}.}
+`envir`.}
 
 \item{envir}{Environment to receive the indexed data frame when
-\code{assign_name} is supplied.}
+`assign_name` is supplied.}
 }
 \value{
 Returns a data frame with one row per file and the columns
-\code{file_name}, \code{file_path}, \code{model}, \code{serial_number},
-\code{vemco_data_log_value}, and \code{vdat_version}.
+`file_name`, `file_path`, `model`, `serial_number`,
+`vemco_data_log_value`, and `vdat_version`.
 }
 \description{
 Create an index of receiver log files by scanning a directory of exported
@@ -35,11 +35,11 @@ csv log files and extracting file-level metadata from each file header.
 }
 \details{
 The function reads the first record in each file to identify the
-\code{VEMCO DATA LOG} metadata and then searches the remaining records for
+`VEMCO DATA LOG` metadata and then searches the remaining records for
 fields describing receiver model and serial number. A warning is emitted if
-more than one \code{vemco_data_log_value} is detected across files, which may
+more than one `vemco_data_log_value` is detected across files, which may
 indicate that source logs should be converted with
-\code{FathomR::convert_log_files()} or re-exported from Fathom Central or
+`FathomR::convert_log_files()` or re-exported from Fathom Central or
 Fathom Connect.
 }
 \examples{
@@ -51,4 +51,5 @@ inspect_receiver_log_index(
   assign_name = "receiver_log_index"
 )
 }
+
 }

@@ -163,7 +163,7 @@ inspect_receiver_log_index <- function(directory_path,
         "Conflict detected in vemco_data_log_value.",
         "Please convert .vrl or .vdat using",
         "FathomR::convert_logfiles() or export from",
-        "Fathom Central or Connect"
+        "Fathom Central or Connect prior to using parse_fathom_files()"
       ),
       call. = FALSE
     )
